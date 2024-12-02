@@ -1,7 +1,5 @@
-<% if (title) { %>
-    <h1><%= title %></h1>
-    <% } else {
-      res.redirect('/')
-    } %>
-
-<%- message %>
+<div class="error-display">
+    <h2><%- title %></h2>
+    <p><%- message %></p>
+    <img src="/images/site/error.svg" alt="error">
+</div>

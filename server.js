@@ -1,18 +1,31 @@
 /* ******************************************
- * This server.js file is the primary file of the 
+ * This server.js file is the primary file of the
  * application. It is used to control the project.
  *******************************************/
+
 /* ***********************
  * Require Statements
  *************************/
-const express = require("express")
-const expressLayouts = require("express-ejs-layouts")
-const env = require("dotenv").config()
-const app = express()
-const static = require("./routes/static")
-const baseController = require("./controllers/baseController")
-const inventoryRoute = require("./routes/inventoryRoute")
-const utilities = require("./utilities/")
+// Their stuff
+const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
+const session = require("express-session");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+
+// My stuff
+const static = require("./routes/static");
+const baseController = require("./controllers/baseController");
+const inventoryRoute = require("./routes/inventoryRoute.js");
+const accountRoute = require('./routes/accountRoute.js');
+const messageRoute = require('./routes/messageRoute.js');
+const intentionalErrorRoute = require("./routes/intentionalErrorRoute.js");
+const utilities = require("./utilities/index.js");
+const pool = require("./database");
+
+// Init
+const app = express();
+const env = require("dotenv").config();
 
 /* ***********************
  * View Engine and Templates
@@ -24,14 +37,20 @@ app.set("layout", "./layouts/layout") // not at view root
 /* ***********************
  * Routes
  *************************/
-app.use(static)
+app.use(static);
 // Index route
-app.get("/", utilities.handleErrors(baseController.buildHome))
+app.get("/", utilities.handleErrors(baseController.buildHome));
 // Inventory routes
-app.use("/inv", inventoryRoute)
+app.use("/inv", inventoryRoute);
+// Account routes
+app.use("/account", accountRoute);
+// Message routes
+app.use("/message", messageRoute);
+// Intentional error route. Used for testing
+app.use("/ierror", intentionalErrorRoute);
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {
-  next({status: 404, message: 'Sorry, we appear to have lost that page.'})
+  next({status: 404, message: 'Unfortunately, we don\'t have that page in stock.'})
 })
 
 /* ***********************
