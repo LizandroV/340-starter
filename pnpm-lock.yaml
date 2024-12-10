@@ -12,7 +12,7 @@ importers:
         specifier: ^2.4.3
         version: 2.4.3
       body-parser:
-        specifier: ^1.20.2
+        specifier: ^1.20.3
         version: 1.20.3
       connect-flash:
         specifier: ^0.1.1
@@ -39,10 +39,10 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       express-session:
-        specifier: ^1.18.0
+        specifier: ^1.18.1
         version: 1.18.1
       express-validator:
-        specifier: ^7.0.1
+        specifier: ^7.2.0
         version: 7.2.0
       jsonwebtoken:
         specifier: ^9.0.2
