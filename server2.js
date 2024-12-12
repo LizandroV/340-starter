@@ -12,57 +12,49 @@ const expressLayouts = require("express-ejs-layouts");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const PgStore = require("connect-pg-simple")(session);
-const flash = require("connect-flash");
 
 // My stuff
-const static = require("./routes/static");
-const baseController = require("./controllers/baseController");
+const static = require("./routes/static.js");
+const baseController = require("./controllers/baseController.js");
 const inventoryRoute = require("./routes/inventoryRoute.js");
-const accountRoute = require("./routes/accountRoute.js");
-const messageRoute = require("./routes/messageRoute.js");
+const accountRoute = require('./routes/accountRoute.js');
+const messageRoute = require('./routes/messageRoute.js');
 const intentionalErrorRoute = require("./routes/intentionalErrorRoute.js");
 const utilities = require("./utilities/index.js");
-const pool = require("./database");
+const pool = require("./database/index.js");
 
 // Init
 const app = express();
 const env = require("dotenv").config();
 
+
 /* ***********************
  * Middleware
- *************************/
+ * ************************/
 app.use(
-    session({
-      store: new PgStore({
-        pool, // Reuse the existing connection pool
-        createTableIfMissing: true, // Automatically create the session table if missing
-      }),
-      secret: process.env.SESSION_SECRET || "supersecretkey", // Fallback for local testing
-      resave: false, // Avoid resaving unchanged sessions
-      saveUninitialized: false, // Don't save empty sessions
-      name: "sessionId", // Custom session cookie name
-      cookie: {
-        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-        httpOnly: true, // Prevent access to cookies via JavaScript
-        maxAge: 1000 * 60 * 60 * 24, // 1 day
-      },
-    })
-  );
-// Flash messages middleware
-app.use(flash());
-app.use((req, res, next) => {
+  session({
+    store: new (require("connect-pg-simple")(session))({
+      createTableIfMissing: true,
+      pool,
+    }),
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    name: "sessionId",
+  })
+);
+// Express Messages Middleware
+app.use(require("connect-flash")());
+app.use(function (req, res, next) {
   res.locals.messages = require("express-messages")(req, res);
   next();
 });
-
-// Body parser
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(bodyParser.urlencoded({ // for parsing application/x-www-form-urlencoded
+  extended: true
+}));
 // Cookie parser
-app.use(cookieParser());
-
+app.use(cookieParser())
 // JWT checker
 app.use(utilities.checkJWTToken);
 
@@ -89,27 +81,24 @@ app.use("/message", messageRoute);
 app.use("/ierror", intentionalErrorRoute);
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {
-  next({ status: 404, message: "Unfortunately, we don't have that page in stock." });
-});
+  next({status: 404, message: 'Unfortunately, we don\'t have that page in stock.'})
+})
 
 /* ***********************
- * Express Error Handler
- * Place after all other middleware
- *************************/
+* Express Error Handler
+* Place after all other middleware
+*************************/
 app.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav();
-  console.error(`Error at: "${req.originalUrl}": ${err.message}`);
+  let nav = await utilities.getNav()
+  console.error(`Error at: "${req.originalUrl}": ${err.message}`)
   console.dir(err);
-  const message =
-    err.status === 404
-      ? err.message
-      : "Oh no! There was a crash. Maybe try a different route?";
+  if(err.status == 404){ message = err.message} else {message = 'Oh no! There was a crash. Maybe try a different route?'}
   res.render("errors/error", {
-    title: err.status || "Server Error",
+    title: err.status || 'Server Error',
     message,
-    nav,
-  });
-});
+    nav
+  })
+})
 
 /* ***********************
  * Local Server Information

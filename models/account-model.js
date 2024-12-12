@@ -12,7 +12,8 @@ async function registerAccount(
   try {
     const sql =
       "INSERT INTO account (account_firstname, account_lastname, account_email, account_password, account_type) VALUES ($1, $2, $3, $4, 'Client') RETURNING *";
-    return await pool.query(sql, [
+      console.log("##REGISTRANDO##")
+      return await pool.query(sql, [
       account_firstname,
       account_lastname,
       account_email,
@@ -28,6 +29,7 @@ async function registerAccount(
  * ********************* */
 async function checkExistingEmail(account_email, excludedEmail = null) {
   try {
+    console.log("##REVISANDO##")
     if(excludedEmail) {
       const sql = "SELECT * FROM account WHERE account_email = $1 AND account_email != $2";
       const email = await pool.query(sql, [account_email, excludedEmail]);
@@ -63,10 +65,9 @@ async function getAccountByEmail(account_email) {
  * ***************************** */
 async function getAccountById(account_id) {
   try {
-    const result = await pool.query(
-      "SELECT account_id, account_firstname, account_lastname, account_email, account_type, account_password FROM account WHERE account_id = $1",
-      [account_id]
-    );
+    console.log("##INICIANDO##")
+    const sql = "SELECT account_id, account_firstname, account_lastname, account_email, account_type, account_password FROM account WHERE account_id = $1"
+    const result = await pool.query(sql, [account_id]);
     return result.rows[0];
   } catch (error) {
     return new Error("No matching email found");
