@@ -223,17 +223,17 @@ Util.updateCookie = (accountData, res) => {
 /* ****************************************
  *  Check Login
  * ************************************ */
-Util.checkLogin = (req, res, next) => {
-  next(); // Permite que continúe sin validar sesión
-};
 // Util.checkLogin = (req, res, next) => {
-//   if (res.locals.loggedin) {
-//     next();
-//   } else {
-//     req.flash("notice", "Please log in.");
-//     return res.redirect("/account/login");
-//   }
+//   next(); // Permite que continúe sin validar sesión
 // };
+Util.checkLogin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    next();
+  } else {
+    req.flash("notice", "Please log in.");
+    return res.redirect("/account/login");
+  }
+};
 
 /* ****************************************
  *  Check authorization

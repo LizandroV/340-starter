@@ -2,26 +2,20 @@
 const express = require("express");
 const router = new express.Router();
 
-const accountController = require("../controllers/accountControlle2r");
+const accountController = require("../controllers/accountController3");
 const utilities = require("../utilities");
-const regValidate = require("../utilities/account-validation");
+const regValidate = require("../utilities/account-validation2");
 
-
+// Redirigir directamente a la vista de administración
 router.get("/", utilities.handleErrors(accountController.buildAccountManagementView));
 
-// Route to build account view
-router.get("/login", utilities.handleErrors(accountController.buildLogin));
-router.post(
-  "/login",
-  regValidate.loginRules(),
-  regValidate.checkLoginData,
-  utilities.handleErrors(accountController.accountLogin)
-);
+// Vista de administración directamente accesible
+router.get("/login", (req, res) => res.redirect("/account"));
 
-// Route to logout
+// Ruta para cerrar sesión
 router.get("/logout", utilities.handleErrors(accountController.accountLogout));
 
-// Registration handlers
+// Manejo de registro
 router.get("/registration", utilities.handleErrors(accountController.buildRegister));
 router.post(
   "/register",
@@ -30,20 +24,19 @@ router.post(
   utilities.handleErrors(accountController.registerAccount)
 );
 
-// Update account handlers
+// Manejo de actualización de cuenta
 router.get("/update/:accountId", utilities.handleErrors(accountController.buildUpdate));
 router.post(
   "/update",
-  regValidate.updateRules(), // TODO: This needs to have a separate rule set, without existing email check..unless...oh complex
+  regValidate.updateRules(),
   regValidate.checkUpdateData,
   utilities.handleErrors(accountController.updateAccount)
-  );
+);
 router.post(
   "/update-password",
   regValidate.updatePasswordRules(),
   regValidate.checkUpdatePasswordData,
   utilities.handleErrors(accountController.updatePassword)
 );
-
 
 module.exports = router;
