@@ -2,9 +2,9 @@
 const express = require("express");
 const router = new express.Router();
 
-const accountController = require("../controllers/accountController3");
+const accountController = require("../controllers/accountController");
 const utilities = require("../utilities");
-const regValidate = require("../utilities/account-validation2");
+const regValidate = require("../utilities/account-validation");
 
 // Redirigir directamente a la vista de administración
 router.get("/", utilities.handleErrors(accountController.buildAccountManagementView));
