@@ -12,7 +12,6 @@ async function registerAccount(
   try {
     const sql =
       "INSERT INTO account (account_firstname, account_lastname, account_email, account_password, account_type) VALUES ($1, $2, $3, $4, 'Client') RETURNING *";
-      console.log("##REGISTRANDO##")
       return await pool.query(sql, [
       account_firstname,
       account_lastname,
@@ -65,7 +64,6 @@ async function getAccountByEmail(account_email) {
  * ***************************** */
 async function getAccountById(account_id) {
   try {
-    console.log("##INICIANDO##")
     const sql = "SELECT account_id, account_firstname, account_lastname, account_email, account_type, account_password FROM account WHERE account_id = $1"
     const result = await pool.query(sql, [account_id]);
     return result.rows[0];
